@@ -63,6 +63,10 @@ module.exports = (sequelize, DataTypes) => {
     phoneNumber: DataTypes.STRING,
     imgUrl: DataTypes.STRING,
     address: DataTypes.STRING,
+    status: {
+      type: DataTypes.STRING,
+      defaultValue: 'inactive'
+    }
   }, {
     hooks: {
       beforeCreate(user) {

@@ -9,7 +9,7 @@ const { Op } = require("sequelize");
 class UserController {
     static async register(req, res, next) {
         try {
-            let { email, password, username, fullname, phoneNumber, imgUrl, address } = req.body;
+            let { email, password, username, fullname, phoneNumber = '', imgUrl = '', address = '' } = req.body;
             const result = await User.create({ email, password, username, fullname, phoneNumber, imgUrl, address });
             res.status(201).json({
                 username: result.username,
@@ -156,6 +156,21 @@ class UserController {
 
             res.status(200).json({ status: 200, message: 'Your profile is updated'})
         } catch (err) {
+            next(err)
+        }
+    }
+
+    static async verify(req, res, next) {
+        try {
+            const { token } = req.params;
+
+            if (!token) {
+                throw { 
+                    
+                }
+            }
+        } catch (err) {
+            console.log(err);
             next(err)
         }
     }
