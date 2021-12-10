@@ -10,6 +10,11 @@ function errorHandler(err, req, res, next ) {
             });
             res.status(code).json({ code, message });
             break;
+        case "SequelizeUniqueConstraintError":
+            code = 500;
+            message = err.errors[0].message
+            res.status(code).json({ code, message });
+            break;
         case "authentication":
             code = 401;
             message = [err.message];

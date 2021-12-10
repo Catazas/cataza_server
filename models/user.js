@@ -63,13 +63,17 @@ module.exports = (sequelize, DataTypes) => {
     phoneNumber: DataTypes.STRING,
     imgUrl: DataTypes.STRING,
     address: DataTypes.STRING,
+    status: {
+      type: DataTypes.STRING,
+      defaultValue: 'inactive'
+    }
   }, {
     hooks: {
       beforeCreate(user) {
         user.password = encode(user.password)
       },
       beforeBulkUpdate(user) {
-        if (user.attributes.password.length < 25) {
+        if (user.attributes.password && user.attributes.password.length < 25) {
           user.attributes.password = encode(user.attributes.password)
         }
       }
