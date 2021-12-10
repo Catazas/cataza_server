@@ -73,7 +73,7 @@ module.exports = (sequelize, DataTypes) => {
         user.password = encode(user.password)
       },
       beforeBulkUpdate(user) {
-        if (user.attributes.password.length < 25) {
+        if (user.attributes.password && user.attributes.password.length < 25) {
           user.attributes.password = encode(user.attributes.password)
         }
       }

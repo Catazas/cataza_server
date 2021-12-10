@@ -1,6 +1,6 @@
 const { User } = require('../models');
 const { decode, encode } = require('../helpers/bcryct');
-const { sign } = require('../helpers/jwt');
+const { sign, verify } = require('../helpers/jwt');
 const fetchGoogleUser = require('../helpers/googleAuth');
 const generator = require('generate-password');
 const { sendEmail, sendEmailForgotPassword } = require('../helpers/nodemailer');
@@ -11,13 +11,29 @@ class UserController {
         try {
             let { email, password, username, fullname, phoneNumber = '', imgUrl = '', address = '' } = req.body;
             const result = await User.create({ email, password, username, fullname, phoneNumber, imgUrl, address });
-            res.status(201).json({
-                username: result.username,
-                email: result.email,
-                id: result.id
-            })
+            if (!result) throw { status: 400, message: 'Register failed' }
+
+            const token = sign({ email, username, id: result.id })
+
+            const url = `http://localhost:3000/users/verification/${token}`
+            await sendEmail(email, url)
+
+            res.status(201).json({ status: 201, message: 'We have sent you an verification link through email' })
         } catch (err) {
             next(err)
+        }
+    }
+
+    static async verification(req, res, next) {
+        try {
+            const { accessToken } = req.params;
+            const payload = verify(accessToken);
+
+            await User.update({ status: 'active' }, { where: { id: payload.id, email: payload.email, username: payload.username } });
+            res.status(200).json({ status: 200, message: 'Your account is active' })
+        } catch (err) {
+            console.log(err);
+            next(err);
         }
     }
 
