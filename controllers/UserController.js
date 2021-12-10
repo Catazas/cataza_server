@@ -7,6 +7,7 @@ const { sendEmail, sendEmailForgotPassword } = require('../helpers/nodemailer');
 const { Op } = require("sequelize");
 
 class UserController {
+
     static async register(req, res, next) {
         try {
             let { email, password, username, fullname, phoneNumber, imgUrl, address } = req.body;
@@ -88,7 +89,6 @@ class UserController {
                 length: 10,
                 numbers: true
             })
-
             await User.update(
                 { password: newPassword },
                 {
@@ -131,14 +131,52 @@ class UserController {
         }
     }
 
+    static async editPassword(req, res, next) {
+        try {
+            const { oldPassword, newPassword, confirmPassword } = req.body;
+            const { id, email } = req.user;
+
+            const currentPassword = await User.findOne({
+                where: { id, email },
+                attributes: ['password']
+            })
+
+            if (newPassword !== confirmPassword) {
+                throw {
+                    name: 'update',
+                    message: 'New password and Confirm password not the same'
+                }
+            }
+            const passwordDecoded = decode(oldPassword, currentPassword.password)
+            if (!passwordDecoded) {
+                throw {
+                    name: 'update',
+                    message: 'Old password not same as previous password'
+                }
+            }
+            console.log(newPassword)
+
+            await User.update({
+                password: newPassword
+            }, {
+                where: { id, email },
+                returning: true
+            })
+            res.status(200).json({ status: 200, message: 'Your password has changed, please Login Again' })
+        } catch (err) {
+            console.log(err)
+            next(err)
+        }
+    }
+
     static async updateProfile(req, res, next) {
         try {
             const { username, fullname, phoneNumber, imgUrl, address } = req.body;
             const { id, email } = req.user;
 
-            const currentUser = await User.findOne({ 
+            const currentUser = await User.findOne({
                 where: { id, email },
-                attributes: ['username', 'fullname', 'phoneNumber', 'imgUrl', 'address' ]
+                attributes: ['username', 'fullname', 'phoneNumber', 'imgUrl', 'address']
             })
 
             const isDataChanged = JSON.stringify(currentUser) === JSON.stringify({ username, fullname, phoneNumber, imgUrl, address })
@@ -154,7 +192,7 @@ class UserController {
                 returning: true
             })
 
-            res.status(200).json({ status: 200, message: 'Your profile is updated'})
+            res.status(200).json({ status: 200, message: 'Your profile is updated' })
         } catch (err) {
             next(err)
         }

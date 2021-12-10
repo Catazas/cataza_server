@@ -13,5 +13,5 @@ router.post('/forgot-password', UserController.forgetPassword)
 router.post('/login-google', UserController.googleLogin)
 router.use(authentication);
 router.put('/update-profile', UserController.updateProfile)
-
+router.put('/edit-password', UserController.editPassword)
 module.exports = router;
