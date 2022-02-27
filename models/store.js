@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Store extends Model {
     /**
@@ -11,39 +9,42 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Store.belongsTo(models.User, { foreignKey: "UserId" })
-      Store.hasMany(models.Product, { foreignKey: "StoreId"})
+      Store.belongsTo(models.User, { foreignKey: "UserId" });
+      Store.hasMany(models.Product, { foreignKey: "StoreId" });
     }
-  };
-  Store.init({
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notNull: {
-          msg: "Name is required"
+  }
+  Store.init(
+    {
+      storeName: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notNull: {
+            msg: "Name is required",
+          },
+          notEmpty: {
+            msg: "Name cant be empty",
+          },
         },
-        notEmpty: {
-          msg: "Name cant be empty"
-        }
-      }
+      },
+      UserId: DataTypes.INTEGER,
+      address: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notNull: {
+            msg: "Address is required",
+          },
+          notEmpty: {
+            msg: "Address cant be empty",
+          },
+        },
+      },
     },
-    UserId: DataTypes.INTEGER,
-    address: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notNull: {
-          msg: "Address is required"
-        },
-        notEmpty: {
-          msg: "Address cant be empty"
-        }
-      }
+    {
+      sequelize,
+      modelName: "Store",
     }
-  }, {
-    sequelize,
-    modelName: 'Store',
-  });
+  );
   return Store;
 };
